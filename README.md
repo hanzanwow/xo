@@ -15,8 +15,8 @@ A terminal-based Tic Tac Toe game implemented in modern C++ with multiple AI dif
 * AI System
 
   * Smart move evaluation
-  * Recursive Minimax algorithm
-  * Designed for future Alpha-Beta pruning
+  * Recursive Minimax with Alpha-Beta pruning
+  * Layered scoring: prefers faster wins, slower losses, and central control
 
 * Terminal UI
 
@@ -75,12 +75,14 @@ g++ *.cpp -o gamehub -std=c++23 -Wall -Wextra -lstdc++exp
 
 ### Hard Mode (Minimax)
 
-* Explores all possible board states
-* Assigns scores:
+* Explores all possible board states (Minimax with Alpha-Beta pruning)
+* Assigns a **layered terminal score** so each tier dominates the next:
 
-  * +10 → AI wins
-  * -10 → Player wins
-  * 0 → Tie
+  * AI wins     → `(10 - depth) * 100 + positionBonus`  (faster wins score higher)
+  * Player wins → `(depth - 10) * 100 + positionBonus`  (slower losses score higher)
+  * Tie         → `positionBonus`                        (broken by central control)
+* `positionBonus` = Σ(AI cell weights) − Σ(player cell weights), where each cell's weight
+  is the number of winning lines through it (center 4, corners 3, edges 2)
 * Always selects the optimal move
 
 ---
