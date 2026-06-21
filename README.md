@@ -1,6 +1,6 @@
 # Tic Tac Toe AI (C++)
 
-A terminal-based Tic Tac Toe game implemented in modern C++ with multiple AI difficulty levels, including a Minimax-powered hard mode.
+A Tic Tac Toe game implemented in modern C++ with multiple AI difficulty levels, including a Minimax-powered hard mode. Playable both in the **terminal** and through a graphical **SFML GUI**.
 
 ---
 
@@ -23,6 +23,13 @@ A terminal-based Tic Tac Toe game implemented in modern C++ with multiple AI dif
   * Clean board rendering
   * Colored output using ANSI escape codes
 
+* Graphical UI (SFML)
+
+  * Mouse-driven 3x3 board
+  * Difficulty-selection menu (Easy / Medium / Hard)
+  * Live scoreboard and win / lose / tie screen
+  * Reuses the exact same game engine and AI as the terminal version
+
 * Score Tracking
 
   * Player wins
@@ -35,28 +42,63 @@ A terminal-based Tic Tac Toe game implemented in modern C++ with multiple AI dif
 
 ```
 .
-├── main.cpp
-├── TicTacToe.h / .cpp     # Core game engine
-├── Player.h / .cpp        # Human input handling
+├── main.cpp               # Terminal entry point
+├── gui_main.cpp           # GUI (SFML) entry point
+├── TicTacToe.h / .cpp     # Core game engine (+ public GUI driver API)
+├── Player.h / .cpp        # Human input handling (terminal)
 ├── XOBot.h / .cpp         # AI logic (Easy / Medium / Hard)
+├── GameGui.h / .cpp       # SFML graphical front-end
 ├── Utils.h                # Terminal utilities (colors)
+├── CMakeLists.txt         # Build all targets
 ```
 
 ---
 
 ## Build & Run
 
-### Compile
+> Requires a C++23 compiler with `<print>` support (GCC 14+ / MSYS2 UCRT64).
+
+### Option A — CMake (builds every target)
 
 ```bash
-g++ *.cpp -o gamehub -std=c++23 -Wall -Wextra -lstdc++exp
+cmake -S . -B build
+cmake --build build
+# Executables land in ./build : gamehub, gamehub-gui, test_runner, execution-time
 ```
 
-### Run
+### Option B — g++ directly
+
+**Terminal version**
 
 ```bash
+g++ main.cpp TicTacToe.cpp XOBot.cpp Player.cpp -o gamehub -std=c++23 -Wall -Wextra -lstdc++exp
 ./gamehub
 ```
+
+**Graphical version (SFML)** — requires SFML 2.6 (`sudo apt install libsfml-dev` on Debian/Ubuntu, or `pacman -S mingw-w64-ucrt-x86_64-sfml` on MSYS2)
+
+```bash
+# Linux
+g++ gui_main.cpp GameGui.cpp TicTacToe.cpp XOBot.cpp Player.cpp \
+    -o gamehub-gui -std=c++23 -Wall -Wextra -lstdc++exp \
+    -lsfml-graphics -lsfml-window -lsfml-system
+./gamehub-gui
+
+# Windows (MSYS2 / MinGW)
+g++ gui_main.cpp GameGui.cpp TicTacToe.cpp XOBot.cpp Player.cpp \
+    -o gamehub-gui.exe -std=c++23 -Wall -Wextra -lstdc++exp \
+    $(pkg-config --cflags --libs sfml-graphics sfml-window sfml-system)
+```
+
+> SFML link order matters: `graphics → window → system`.
+> The GUI loads a TrueType font from common system locations (DejaVu / Liberation / Arial);
+> to bundle your own, drop a `DejaVuSans.ttf` into an `assets/` folder next to the executable.
+
+### How to play the GUI
+
+Pick a difficulty, then click any empty cell to place your `X`. The computer
+(`O`) responds automatically. After a game ends, choose **Play Again** (same
+difficulty) or **Menu** (change difficulty).
 
 ---
 
@@ -107,7 +149,7 @@ Enter number (1-9) to place your 'X':
 
 - [x] Alpha-Beta pruning (performance optimization)
 
-~~- [ ] GUI version using SFML~~
+- [x] GUI version using SFML
 - [ ] Test function $1/3$
   - [ ] Easy mode
   - [ ] Medium mode
