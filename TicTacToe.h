@@ -39,7 +39,7 @@ namespace XO
         Difficulty random_model();
         void drawBoard();
         void resetBoard();
-        char checkGameStatus();
+        char checkGameStatus() const;
         bool PlayAgain();
         void updateScore(char status);
         void displayScore();
@@ -77,6 +77,40 @@ namespace XO
 
         // Returns game mode
         auto &getMode() const { return mode; }
+
+        /*
+        #########==================================================#########
+        #########----- GUI / external-driver API (additive) ------#########
+        #########==================================================#########
+            Thin public wrappers that let an event-driven front-end (e.g. the
+            SFML GUI) reuse the engine without the terminal-coupled runGame()
+            loop. None of these touch std::cin / std::cout.
+        */
+
+        // Reset the board and (re)start a match. Does NOT pick a mode or print.
+        void newGame()
+        {
+            resetBoard();
+            running = true;
+        }
+
+        // Public, read-only wrapper over checkGameStatus().
+        // Returns 'X' | 'O' | 'T' | ' ' (space = still in progress).
+        char status() const { return checkGameStatus(); }
+
+        // Drive one AI move using the engine's own XOBot (Easy/Medium/Hard).
+        void botMove() { ptrBot->Move(); }
+
+        // Set the difficulty (pairs with getMode()).
+        void setMode(Difficulty d) { mode = d; }
+
+        // Apply the engine's score bookkeeping for a finished match.
+        void recordResult(char finalStatus) { updateScore(finalStatus); }
+
+        // Score getters for the GUI scoreboard.
+        int getPlayerWins() const { return PlayerWins; }
+        int getComputerWins() const { return ComputerWins; }
+        int getTies() const { return Ties; }
 
         TicTacToe();
         ~TicTacToe();

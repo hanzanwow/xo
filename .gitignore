@@ -1,0 +1,14 @@
+# Build output
+/build/
+
+# Compiled executables
+gamehub
+gamehub-gui
+test_runner
+execution-time
+*.exe
+*.o
+*.obj
+
+# Optional bundled fonts (drop your own DejaVuSans.ttf here)
+/assets/

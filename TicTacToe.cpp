@@ -130,7 +130,7 @@ void XO::TicTacToe::resetBoard()
     spaces.fill(' ');
 }
 
-char XO::TicTacToe::checkGameStatus()
+char XO::TicTacToe::checkGameStatus() const
 {
     /*
     std::array<std::array<3>,8> wins = {
